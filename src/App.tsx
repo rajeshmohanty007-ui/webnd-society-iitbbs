@@ -38,7 +38,7 @@ export default function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Update active section and scroll progress during native mobile scrolling
+  // Update scroll progress during native mobile scrolling
   useEffect(() => {
     if (!isMobile) return;
     const mainEl = mainRef.current;
@@ -50,15 +50,14 @@ export default function App() {
       if (height === 0) return;
 
       const exactIndex = scrollTop / height;
-      const index = Math.round(exactIndex);
-
-      setActiveSection(index);
       setScrollProgress(exactIndex);
     };
 
     mainEl.addEventListener('scroll', handleScroll, { passive: true });
     return () => mainEl.removeEventListener('scroll', handleScroll);
   }, [isMobile, setScrollProgress]);
+
+
 
   // Update refs to prevent listener thrashing
   useEffect(() => {
@@ -155,13 +154,14 @@ export default function App() {
       if (nextSection !== curSection) {
         setTargetScroll(nextSection);
         setActiveSection(nextSection);
+        // console.log(nextSection);
         lastScrollTime.current = now;
       }
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [setProjectScroll]);
+  }, [isMobile, setProjectScroll]);
 
   // Handle touch swiping for mobile devices
   useEffect(() => {
@@ -225,9 +225,10 @@ export default function App() {
       const direction = deltaY > 0 ? 1 : -1;
       const nextSection = Math.min(4, Math.max(0, curSection + direction));
 
-      if (nextSection !== curSection) {
+      if (nextSection !== curSection && !isMobile) {
         setTargetScroll(nextSection);
         setActiveSection(nextSection);
+        console.log(nextSection, isMobile);
         lastScrollTime.current = now;
       }
     };
@@ -239,7 +240,7 @@ export default function App() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [setProjectScroll]);
+  }, [isMobile, setProjectScroll]);
 
   // Handle arrow key and PageUp/PageDown key navigation
   useEffect(() => {
@@ -251,19 +252,21 @@ export default function App() {
         if (nextSection !== curSection) {
           setTargetScroll(nextSection);
           setActiveSection(nextSection);
+          // console.log(nextSection);
         }
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
         const nextSection = Math.max(0, curSection - 1);
         if (nextSection !== curSection) {
           setTargetScroll(nextSection);
           setActiveSection(nextSection);
+          // console.log(nextSection);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isMobile]);
 
   // Handle smooth scroll clicks from navigation header
   const scrollToSection = (index: number) => {
@@ -272,11 +275,9 @@ export default function App() {
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
-      setActiveSection(index);
       setScrollProgress(index);
     } else {
       setTargetScroll(index);
-      setActiveSection(index);
     }
   };
 
@@ -315,7 +316,7 @@ export default function App() {
       <FluidCursor />
 
       {/* 2. Fixed layout Header & navigation */}
-      <Header activeSection={activeSection} scrollToSection={scrollToSection} />
+      <Header activeSection={activeSection} setActiveSection={setActiveSection} scrollToSection={scrollToSection} />
 
       {/* 3. Foreground DOM content pages */}
       <main

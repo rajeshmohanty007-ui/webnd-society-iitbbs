@@ -3,10 +3,11 @@ import { Terminal, Shield, Cpu, Flame, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   activeSection: number;
+  setActiveSection: React.Dispatch<React.SetStateAction<number>>;
   scrollToSection: (index: number) => void;
 }
 
-export default function Header({ activeSection, scrollToSection }: HeaderProps) {
+export default function Header({ activeSection, setActiveSection, scrollToSection }: HeaderProps) {
   const [time, setTime] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -50,9 +51,8 @@ export default function Header({ activeSection, scrollToSection }: HeaderProps) 
             <button
               key={item.index}
               onClick={() => scrollToSection(item.index)}
-              className={`relative py-1 tracking-widest transition-colors duration-300 cursor-pointer ${
-                isActive ? 'text-[#FFEA00] font-bold' : 'text-neutral-400 hover:text-white'
-              }`}
+              className={`relative py-1 tracking-widest transition-colors duration-300 cursor-pointer ${isActive ? 'text-[#FFEA00] font-bold' : 'text-neutral-400 hover:text-white'
+                }`}
             >
               {item.label}
               {isActive && (
@@ -90,10 +90,10 @@ export default function Header({ activeSection, scrollToSection }: HeaderProps) 
               onClick={() => {
                 scrollToSection(item.index);
                 setMobileMenuOpen(false);
+                setActiveSection(item.index);
               }}
-              className={`text-left text-sm py-2 tracking-widest font-semibold ${
-                activeSection === item.index ? 'text-[#FFEA00]' : 'text-neutral-400'
-              }`}
+              className={`text-left text-sm py-2 tracking-widest font-semibold ${activeSection === item.index ? 'text-[#FFEA00]' : 'text-neutral-400'
+                }`}
             >
               &gt; {item.label}
             </button>

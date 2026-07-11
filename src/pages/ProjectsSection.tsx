@@ -151,7 +151,7 @@ export default function ProjectsSection({ scrollProgress }: ProjectsSectionProps
           >
             <div className="absolute inset-0 bg-radial-glow opacity-30 pointer-events-none" />
 
-            <div className="relative w-full max-w-4xl bg-[#0c0c09] border border-[#A88100]/30 rounded-sm z-10 max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="relative w-full md:mt-0 max-w-4xl bg-[#0c0c09] border border-[#A88100]/30 rounded-sm z-10 max-h-[70vh] flex flex-col overflow-hidden">
               {/* Header/Close Button Bar */}
               <div className="flex justify-between items-center border-b border-[#A88100]/20 px-6 py-4 select-none">
                 <span className="text-[10px] text-neutral-500 uppercase tracking-widest font-mono">PROJECT_DETAIL // INTERFACE</span>
@@ -167,81 +167,81 @@ export default function ProjectsSection({ scrollProgress }: ProjectsSectionProps
               <div className="p-6 md:p-10 flex flex-col md:grid md:grid-cols-12 gap-8 overflow-y-auto">
                 {/* Left Column: Title & Metas */}
                 <div className="md:col-span-7 flex flex-col justify-between space-y-6">
-                <div>
-                  <div className="flex items-center gap-2 text-xs text-[#FFEA00] font-bold tracking-widest mb-4">
-                    <Calendar size={13} />
-                    <span>YEAR: {selectedProject.year}</span>
-                    <span className="text-neutral-600">|</span>
-                    <span>{selectedProject.category.toUpperCase()}</span>
+                  <div>
+                    <div className="flex items-center gap-2 text-xs text-[#FFEA00] font-bold tracking-widest mb-4">
+                      <Calendar size={13} />
+                      <span>YEAR: {selectedProject.year}</span>
+                      <span className="text-neutral-600">|</span>
+                      <span>{selectedProject.category.toUpperCase()}</span>
+                    </div>
+
+                    <h3 className="text-3xl md:text-5xl font-black uppercase text-[#FFEA00] tracking-tighter leading-none mb-6 font-sans">
+                      {selectedProject.title}
+                    </h3>
+
+                    <p className="text-sm text-neutral-300 leading-relaxed max-w-xl font-sans font-normal">
+                      {selectedProject.description}
+                    </p>
                   </div>
 
-                  <h3 className="text-3xl md:text-5xl font-black uppercase text-[#FFEA00] tracking-tighter leading-none mb-6 font-sans">
-                    {selectedProject.title}
-                  </h3>
-
-                  <p className="text-sm text-neutral-300 leading-relaxed max-w-xl font-sans font-normal">
-                    {selectedProject.description}
-                  </p>
+                  <div className="flex flex-wrap gap-2 pt-4">
+                    {selectedProject.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] bg-[#FFEA00]/5 border border-[#A88100]/20 text-[#FFC107] px-2.5 py-1 rounded-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 pt-4">
-                  {selectedProject.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[10px] bg-[#FFEA00]/5 border border-[#A88100]/20 text-[#FFC107] px-2.5 py-1 rounded-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Column: Generative Preview & Actions */}
-              <div className="md:col-span-5 flex flex-col justify-between border-t md:border-t-0 md:border-l border-[#A88100]/20 pt-6 md:pt-0 md:pl-8 space-y-6">
-                <div className="aspect-video w-full border border-[#A88100]/20 bg-[#0B0B08] p-4 flex flex-col justify-between relative overflow-hidden group">
-                  {/* Subtle pulsing coordinate lines representing visual canvas */}
-                  <div className="absolute inset-0 bg-grid-pattern opacity-15" />
-                  <span className="text-[8px] text-neutral-600 uppercase">PREVIEW_ENGINE_ACTIVE</span>
-                  <div className="my-auto text-center space-y-2 relative z-10">
-                    <span className="text-3xl text-[#FFC107] font-black tracking-widest animate-pulse">
+                {/* Right Column: Generative Preview & Actions */}
+                <div className="md:col-span-5 flex flex-col justify-between border-t md:border-t-0 md:border-l border-[#A88100]/20 pt-6 md:pt-0 md:pl-8 space-y-6">
+                  <div className="aspect-video w-full border border-[#A88100]/20 bg-[#0B0B08] p-4 flex flex-col justify-between relative overflow-hidden group">
+                    {/* Subtle pulsing coordinate lines representing visual canvas */}
+                    <div className="absolute inset-0 bg-grid-pattern opacity-15" />
+                    <span className="text-[8px] text-neutral-600 uppercase">PREVIEW_ENGINE_ACTIVE</span>
+                    <div className="my-auto text-center space-y-2 relative z-10">
+                      <span className="text-3xl text-[#FFC107] font-black tracking-widest animate-pulse">
                       // {selectedProject.imageSeed.toUpperCase()} //
+                      </span>
+                    </div>
+                    <span className="text-[8px] text-neutral-600 uppercase text-right">
+                      LOC: 20.1484° N, 85.6712° E
                     </span>
                   </div>
-                  <span className="text-[8px] text-neutral-600 uppercase text-right">
-                    LOC: 20.1484° N, 85.6712° E
-                  </span>
-                </div>
 
-                <div className="space-y-3">
-                  <span className="text-[9px] text-[#A88100] tracking-widest font-bold block mb-1">
-                    EXECUTE_LINKS:
-                  </span>
-                  {selectedProject.github && (
-                    <a
-                      href={selectedProject.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full flex items-center justify-between border border-[#FFEA00]/30 hover:border-[#FFEA00] bg-[#FFEA00]/5 hover:bg-[#FFEA00]/10 py-3.5 px-5 text-xs text-[#FFEA00] tracking-widest uppercase transition-all rounded-sm"
-                    >
-                      <span>REPOSITORY_SOURCE</span>
-                      <Github size={14} />
-                    </a>
-                  )}
-                  {selectedProject.demo && (
-                    <a
-                      href={selectedProject.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full flex items-center justify-between border border-neutral-700 hover:border-white bg-transparent py-3.5 px-5 text-xs text-white tracking-widest uppercase transition-all rounded-sm"
-                    >
-                      <span>LIVE_DEMO_INSTANCE</span>
-                      <ExternalLink size={14} />
-                    </a>
-                  )}
+                  <div className="space-y-3">
+                    <span className="text-[9px] text-[#A88100] tracking-widest font-bold block mb-1">
+                      EXECUTE_LINKS:
+                    </span>
+                    {selectedProject.github && (
+                      <a
+                        href={selectedProject.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-between border border-[#FFEA00]/30 hover:border-[#FFEA00] bg-[#FFEA00]/5 hover:bg-[#FFEA00]/10 py-3.5 px-5 text-xs text-[#FFEA00] tracking-widest uppercase transition-all rounded-sm"
+                      >
+                        <span>REPOSITORY_SOURCE</span>
+                        <Github size={14} />
+                      </a>
+                    )}
+                    {selectedProject.demo && (
+                      <a
+                        href={selectedProject.demo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-between border border-neutral-700 hover:border-white bg-transparent py-3.5 px-5 text-xs text-white tracking-widest uppercase transition-all rounded-sm"
+                      >
+                        <span>LIVE_DEMO_INSTANCE</span>
+                        <ExternalLink size={14} />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           </motion.div>
         )}
       </AnimatePresence>
