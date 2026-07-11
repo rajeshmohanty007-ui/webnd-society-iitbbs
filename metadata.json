@@ -1,0 +1,6 @@
+{
+  "name": "IIT Bhubaneswar Web & Design Society Showcase",
+  "description": "The official immersive showcase site of IIT Bhubaneswar Web & Design Society, featuring cyber-gold aesthetics, parallax scrolling, bento grids, and interactive canvas effects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
