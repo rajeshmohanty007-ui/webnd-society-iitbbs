@@ -61,7 +61,7 @@ export default function MemberSection({ scrollProgress }: MemberSectionProps) {
         <div>
           <div className="sticky top-20 z-20 bg-[#0B0B08]/95 backdrop-blur-sm py-4 px-2 border-b border-[#A88100]/20 mb-8 flex justify-between items-center font-mono xl:scale-x-110 xl:px-6">
             <span className="text-sm font-bold text-[#FFEA00] tracking-widest flex items-center gap-2">
-              <Network size={14} className="text-[#FFEA00]" /> 02 // CORE COMMITTEE TEAM
+              <Network size={14} className="text-[#FFEA00]" /> 02 // CORE COORDINATION TEAM
             </span>
             <span className="text-[10px] text-neutral-500 uppercase tracking-widest">POSITION HOLDERS</span>
           </div>

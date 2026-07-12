@@ -10,10 +10,10 @@ interface HeroSectionProps {
 export default function HeroSection({ scrollProgress, scrollToSection }: HeroSectionProps) {
   // Let's create beautiful horizontal parallax offsets for kinetic typography based on scrollProgress
   // scrollProgress goes from 0 to 1
-  const line1X = (0.5 - scrollProgress) * -150; // slides right-to-left
-  const line2X = (0.5 - scrollProgress) * 150;  // slides left-to-right
-  const line3X = (0.5 - scrollProgress) * -100; // slides right-to-left
   const [isMobile, setIsMobile] = useState(false);
+  const line1X = isMobile ? 0 : (0.5 - scrollProgress) * -150; // slides right-to-left
+  const line2X = isMobile ? 40 : (0.5 - scrollProgress) * 150;  // slides left-to-right
+  const line3X = isMobile ? 0 : (0.5 - scrollProgress) * -100; // slides right-to-left
 
   useEffect(() => {
     const checkMobile = () => {
@@ -27,15 +27,17 @@ export default function HeroSection({ scrollProgress, scrollToSection }: HeroSec
   return (
     <section className="relative h-screen w-full flex flex-col justify-between items-center px-6 py-24 md:px-12 select-none overflow-hidden">
       {/* Top Left Labeling */}
-      <div className="absolute top-28 left-6 md:left-12 font-mono text-[10px] text-[#A88100] flex items-center gap-2 tracking-widest animate-pulse">
-        <TerminalIcon size={12} className="text-[#FFEA00]" />
-        <span>SEC_01 // COGNITIVE_GATEWAY</span>
-      </div>
+      <div className='w-full flex absolute top-28 px-6 flex-col md:flex-row md:justify-between'>
+        <div className="font-mono text-[10px] text-[#A88100] flex items-center gap-2 tracking-widest animate-pulse">
+          <TerminalIcon size={12} className="text-[#FFEA00]" />
+          <span>SEC_01 // COGNITIVE_GATEWAY</span>
+        </div>
 
-      {/* Top Right Coordinate / Server Status Info */}
-      <div className="absolute top-28 right-6 md:right-12 font-mono text-[9px] text-neutral-500 text-right space-y-0.5">
-        <p>SYSTEM REVISION: R6_2026</p>
-        <p className="text-[#FFC107]">FPS: 60 // GPU_COMPILER_ONLINE</p>
+        {/* Top Right Coordinate / Server Status Info */}
+        <div className="font-mono text-[9px] text-neutral-500 space-y-0.5">
+          <p>SYSTEM REVISION: R6_2026</p>
+          <p className="text-[#FFC107]">FPS: 60 // GPU_COMPILER_ONLINE</p>
+        </div>
       </div>
 
       {/* Center Hero Kinetic Typography */}

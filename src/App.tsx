@@ -51,6 +51,11 @@ export default function App() {
 
       const exactIndex = scrollTop / height;
       setScrollProgress(exactIndex);
+
+      const closestIndex = Math.round(exactIndex);
+      if (closestIndex !== activeSectionRef.current) {
+        setActiveSection(closestIndex);
+      }
     };
 
     mainEl.addEventListener('scroll', handleScroll, { passive: true });
@@ -166,9 +171,11 @@ export default function App() {
   // Handle touch swiping for mobile devices
   useEffect(() => {
     if (isMobile) return;
+    let touchStartX = 0;
     let touchStartY = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
       const curSection = activeSectionRef.current;
       const activeSecEl = document.getElementById(`page-section-${curSection}`);
@@ -177,10 +184,10 @@ export default function App() {
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
+      const touchEndX = e.changedTouches[0].clientX;
       const touchEndY = e.changedTouches[0].clientY;
+      const deltaX = touchStartX - touchEndX; // positive = swipe left (scroll right)
       const deltaY = touchStartY - touchEndY; // positive = swipe up (scroll down)
-
-      if (Math.abs(deltaY) < 50) return; // swipe threshold
 
       const curSection = activeSectionRef.current;
       const curProjScroll = projectScrollRef.current;
@@ -204,20 +211,29 @@ export default function App() {
         }
       }
 
+      // Horizontal gesture handling for projects section (Section 2)
       if (curSection === 2) {
         const startProjScroll = touchStartProjScroll.current;
-        if (deltaY > 0) {
-          if (startProjScroll < 1) {
-            setProjectScroll(Math.min(1.0, curProjScroll + 0.25));
-            return;
-          }
-        } else {
-          if (startProjScroll > 0) {
-            setProjectScroll(Math.max(0.0, curProjScroll - 0.25));
-            return;
+        const useHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+        const swipeDelta = useHorizontal ? deltaX : deltaY;
+
+        if (Math.abs(swipeDelta) >= 40) {
+          if (swipeDelta > 0) {
+            if (startProjScroll < 1) {
+              setProjectScroll(Math.min(1.0, curProjScroll + 0.25));
+              return;
+            }
+          } else {
+            if (startProjScroll > 0) {
+              setProjectScroll(Math.max(0.0, curProjScroll - 0.25));
+              return;
+            }
           }
         }
       }
+
+      // For standard vertical transitions, only trigger if swipe is primarily vertical
+      if (Math.abs(deltaY) < 50 || Math.abs(deltaY) <= Math.abs(deltaX)) return;
 
       const now = Date.now();
       if (now - lastScrollTime.current < scrollCooldown) return;
@@ -225,10 +241,9 @@ export default function App() {
       const direction = deltaY > 0 ? 1 : -1;
       const nextSection = Math.min(4, Math.max(0, curSection + direction));
 
-      if (nextSection !== curSection && !isMobile) {
+      if (nextSection !== curSection) {
         setTargetScroll(nextSection);
         setActiveSection(nextSection);
-        console.log(nextSection, isMobile);
         lastScrollTime.current = now;
       }
     };
@@ -276,8 +291,10 @@ export default function App() {
         el.scrollIntoView({ behavior: 'smooth' });
       }
       setScrollProgress(index);
+      setActiveSection(index);
     } else {
       setTargetScroll(index);
+      setActiveSection(index);
     }
   };
 
