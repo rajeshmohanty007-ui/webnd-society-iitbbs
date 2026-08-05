@@ -20,6 +20,7 @@ export default function ProjectsSection({ scrollProgress }: ProjectsSectionProps
   const [translateX, setTranslateX] = useState(0);
 
   const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);

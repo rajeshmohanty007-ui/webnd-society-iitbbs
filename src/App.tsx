@@ -15,54 +15,24 @@ import AboutSection from './pages/AboutSection';
 import ContactSection from './pages/ContactSection';
 
 export default function App() {
-  const { setMouse, scrollProgress, setScrollProgress, projectScroll, setProjectScroll } = useStore();
+  const { setMouse, scrollProgress, setScrollProgress, projectScroll, setProjectScroll, isAutoScrollEnabled } = useStore();
   const [activeSection, setActiveSection] = useState(0);
   const [targetScroll, setTargetScroll] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+  const canAutoScroll = isAutoScrollEnabled && !isMobileOrTablet;
 
   const activeSectionRef = useRef(activeSection);
   const projectScrollRef = useRef(projectScroll);
   const lastScrollTime = useRef(0);
   const scrollCooldown = 750; // ms transition lock to prevent spinning multiple sections
+
+  const isDragging = useRef(false);
+  const pointerStartY = useRef(0);
+  const pointerStartX = useRef(0);
   const touchStartScrollTop = useRef(0);
   const touchStartProjScroll = useRef(0);
-
-  const [isMobile, setIsMobile] = useState(false);
-  const mainRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Update scroll progress during native mobile scrolling
-  useEffect(() => {
-    if (!isMobile) return;
-    const mainEl = mainRef.current;
-    if (!mainEl) return;
-
-    const handleScroll = () => {
-      const scrollTop = mainEl.scrollTop;
-      const height = mainEl.clientHeight;
-      if (height === 0) return;
-
-      const exactIndex = scrollTop / height;
-      setScrollProgress(exactIndex);
-
-      const closestIndex = Math.round(exactIndex);
-      if (closestIndex !== activeSectionRef.current) {
-        setActiveSection(closestIndex);
-      }
-    };
-
-    mainEl.addEventListener('scroll', handleScroll, { passive: true });
-    return () => mainEl.removeEventListener('scroll', handleScroll);
-  }, [isMobile, setScrollProgress]);
-
-
 
   // Update refs to prevent listener thrashing
   useEffect(() => {
@@ -85,9 +55,18 @@ export default function App() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [setMouse]);
 
-  // Smooth lerping scroll animation loop
+  // Check if device screen width represents mobile or tablet (screen width < 1024px)
   useEffect(() => {
-    if (isMobile) return;
+    const checkDevice = () => {
+      setIsMobileOrTablet(window.innerWidth < 1024);
+    };
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
+
+  // Smooth lerping scroll animation loop driving transition effects
+  useEffect(() => {
     let animationId: number;
     let current = scrollProgress;
 
@@ -105,11 +84,11 @@ export default function App() {
 
     animationId = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationId);
-  }, [targetScroll, scrollProgress, setScrollProgress, isMobile]);
+  }, [targetScroll, scrollProgress, setScrollProgress]);
 
   // Handle custom scrolling events (wheel, touch, keyboard)
   useEffect(() => {
-    if (isMobile) return;
+    if (!canAutoScroll) return;
     const handleWheel = (e: WheelEvent) => {
       const curSection = activeSectionRef.current;
       const curProjScroll = projectScrollRef.current;
@@ -159,107 +138,130 @@ export default function App() {
       if (nextSection !== curSection) {
         setTargetScroll(nextSection);
         setActiveSection(nextSection);
-        // console.log(nextSection);
         lastScrollTime.current = now;
       }
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isMobile, setProjectScroll]);
+  }, [canAutoScroll, setProjectScroll]);
 
-  // Handle touch swiping for mobile devices
+  // Handle manual pointer tracking for screen-by-screen navigation (disables native touch momentum transitions)
   useEffect(() => {
-    if (isMobile) return;
-    let touchStartX = 0;
-    let touchStartY = 0;
+    if (!canAutoScroll) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      // Only drag with left mouse click or touch points
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
 
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
       const curSection = activeSectionRef.current;
       const activeSecEl = document.getElementById(`page-section-${curSection}`);
+
+      pointerStartY.current = e.clientY;
+      pointerStartX.current = e.clientX;
       touchStartScrollTop.current = activeSecEl ? activeSecEl.scrollTop : 0;
       touchStartProjScroll.current = projectScrollRef.current;
+      isDragging.current = true;
     };
 
-    const handleTouchEnd = (e: TouchEvent) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaX = touchStartX - touchEndX; // positive = swipe left (scroll right)
-      const deltaY = touchStartY - touchEndY; // positive = swipe up (scroll down)
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isDragging.current) return;
 
       const curSection = activeSectionRef.current;
-      const curProjScroll = projectScrollRef.current;
-
       const activeSecEl = document.getElementById(`page-section-${curSection}`);
-      if (activeSecEl) {
-        const { clientHeight, scrollHeight } = activeSecEl;
-        const isScrollable = scrollHeight > clientHeight + 5;
+      const deltaY = pointerStartY.current - e.clientY; // positive = dragged up (scroll down)
+      const deltaX = pointerStartX.current - e.clientX;
 
+      let isAtBottom = true;
+      let isAtTop = true;
+
+      if (activeSecEl) {
+        const { scrollTop, scrollHeight, clientHeight } = activeSecEl;
+        const isScrollable = scrollHeight > clientHeight + 5;
         if (isScrollable) {
-          // If swiped up (scrolling down): transition only if we were already at bottom at start of touch
-          if (deltaY > 0) {
-            const wasAtBottom = touchStartScrollTop.current + clientHeight >= scrollHeight - 8;
-            if (!wasAtBottom) return; // scroll natively
-          }
-          // If swiped down (scrolling up): transition only if we were already at top at start of touch
-          if (deltaY < 0) {
-            const wasAtTop = touchStartScrollTop.current <= 5;
-            if (!wasAtTop) return; // scroll natively
-          }
+          isAtBottom = touchStartScrollTop.current + clientHeight >= scrollHeight - 8;
+          isAtTop = touchStartScrollTop.current <= 5;
         }
       }
 
-      // Horizontal gesture handling for projects section (Section 2)
+      // If active section is the horizontal projects slide, let it handle its own pointer drag if horizontal
       if (curSection === 2) {
-        const startProjScroll = touchStartProjScroll.current;
         const useHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
-        const swipeDelta = useHorizontal ? deltaX : deltaY;
+        if (useHorizontal) {
+          return;
+        }
+      }
 
-        if (Math.abs(swipeDelta) >= 40) {
-          if (swipeDelta > 0) {
+      const isDraggingDownAtBottom = deltaY > 0 && isAtBottom && curSection < 4;
+      const isDraggingUpAtTop = deltaY < 0 && isAtTop && curSection > 0;
+
+      if (isDraggingDownAtBottom || isDraggingUpAtTop) {
+        // Prevent default touch scrolling behavior in browser manually
+        if (e.cancelable) e.preventDefault();
+        setDragOffset(deltaY);
+      } else {
+        setDragOffset(0);
+      }
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+
+      const curSection = activeSectionRef.current;
+      const deltaY = pointerStartY.current - e.clientY;
+      const deltaX = pointerStartX.current - e.clientX;
+      const threshold = 80;
+
+      // Handle horizontal swipe in Projects section
+      if (curSection === 2) {
+        const useHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+        if (useHorizontal && Math.abs(deltaX) >= 40) {
+          const startProjScroll = touchStartProjScroll.current;
+          if (deltaX > 0) {
             if (startProjScroll < 1) {
-              setProjectScroll(Math.min(1.0, curProjScroll + 0.25));
-              return;
+              setProjectScroll(Math.min(1.0, projectScrollRef.current + 0.25));
             }
           } else {
             if (startProjScroll > 0) {
-              setProjectScroll(Math.max(0.0, curProjScroll - 0.25));
-              return;
+              setProjectScroll(Math.max(0.0, projectScrollRef.current - 0.25));
             }
           }
         }
       }
 
-      // For standard vertical transitions, only trigger if swipe is primarily vertical
-      if (Math.abs(deltaY) < 50 || Math.abs(deltaY) <= Math.abs(deltaX)) return;
-
-      const now = Date.now();
-      if (now - lastScrollTime.current < scrollCooldown) return;
-
-      const direction = deltaY > 0 ? 1 : -1;
-      const nextSection = Math.min(4, Math.max(0, curSection + direction));
-
-      if (nextSection !== curSection) {
-        setTargetScroll(nextSection);
-        setActiveSection(nextSection);
-        lastScrollTime.current = now;
+      // Handle vertical page transitions if we dragged past the threshold
+      if (Math.abs(deltaY) >= threshold && Math.abs(deltaY) > Math.abs(deltaX)) {
+        const now = Date.now();
+        if (now - lastScrollTime.current >= scrollCooldown) {
+          const direction = deltaY > 0 ? 1 : -1;
+          const nextSection = Math.min(4, Math.max(0, curSection + direction));
+          if (nextSection !== curSection) {
+            setTargetScroll(nextSection);
+            setActiveSection(nextSection);
+            lastScrollTime.current = now;
+          }
+        }
       }
+
+      setDragOffset(0);
     };
 
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove, { passive: false });
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
 
     return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
     };
-  }, [isMobile, setProjectScroll]);
+  }, [canAutoScroll, setProjectScroll]);
 
   // Handle arrow key and PageUp/PageDown key navigation
   useEffect(() => {
-    if (isMobile) return;
+    if (!canAutoScroll) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       const curSection = activeSectionRef.current;
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
@@ -267,43 +269,28 @@ export default function App() {
         if (nextSection !== curSection) {
           setTargetScroll(nextSection);
           setActiveSection(nextSection);
-          // console.log(nextSection);
         }
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
         const nextSection = Math.max(0, curSection - 1);
         if (nextSection !== curSection) {
           setTargetScroll(nextSection);
           setActiveSection(nextSection);
-          // console.log(nextSection);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMobile]);
+  }, [canAutoScroll]);
 
   // Handle smooth scroll clicks from navigation header
   const scrollToSection = (index: number) => {
-    if (isMobile) {
-      const el = document.getElementById(`page-section-${index}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-      setScrollProgress(index);
-      setActiveSection(index);
-    } else {
-      setTargetScroll(index);
-      setActiveSection(index);
-    }
+    setTargetScroll(index);
+    setActiveSection(index);
   };
 
   // Generate responsive inline style offsets for stacked sections
   const getSectionStyle = (index: number) => {
-    if (isMobile) {
-      return {};
-    }
-
     const diff = scrollProgress - index;
     const absDiff = Math.abs(diff);
 
@@ -314,13 +301,21 @@ export default function App() {
     // Slide left/right based on rotation direction
     const translateX = diff * -120;
 
+    // Apply dampened/direct vertical translation to active section during manual drag
+    let translateY = 0;
+    if (index === activeSection) {
+      translateY = -dragOffset;
+    }
+
     const isActive = absDiff < 0.5;
 
     return {
       opacity,
-      transform: `translateX(${translateX}px) scale(${scale})`,
+      transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
       pointerEvents: isActive ? ('auto' as const) : ('none' as const),
       visibility: opacity > 0 ? ('visible' as const) : ('hidden' as const),
+      // Enable CSS transitions when NOT dragging (so it snaps back smoothly when released)
+      transition: dragOffset === 0 ? 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)' : 'none',
     };
   };
 
@@ -337,13 +332,12 @@ export default function App() {
 
       {/* 3. Foreground DOM content pages */}
       <main
-        ref={mainRef}
-        className={`relative z-10 w-full h-full ${isMobile ? 'overflow-y-auto snap-y snap-mandatory scroll-smooth' : 'overflow-hidden'}`}
+        className="relative z-10 w-full h-full overflow-hidden"
       >
         {/* Section 0: Terminal/Hero Gate */}
         <div
           id="page-section-0"
-          className={`page-section w-full h-full flex flex-col justify-center items-center overflow-y-auto ${isMobile ? 'relative snap-start shrink-0' : 'absolute inset-0'}`}
+          className="page-section w-full h-full flex flex-col justify-center items-center overflow-y-auto absolute inset-0"
           style={getSectionStyle(0)}
         >
           <HeroSection scrollProgress={scrollProgress} scrollToSection={scrollToSection} />
@@ -352,7 +346,7 @@ export default function App() {
         {/* Section 1: Digital Roster/Members Bento */}
         <div
           id="page-section-1"
-          className={`page-section w-full h-full overflow-y-auto ${isMobile ? 'relative snap-start shrink-0' : 'absolute inset-0'}`}
+          className="page-section w-full h-full overflow-y-auto absolute inset-0"
           style={getSectionStyle(1)}
         >
           <MemberSection scrollProgress={scrollProgress} />
@@ -361,7 +355,7 @@ export default function App() {
         {/* Section 2: Archive/Projects sliding track */}
         <div
           id="page-section-2"
-          className={`page-section w-full h-full overflow-y-auto ${isMobile ? 'relative snap-start shrink-0' : 'absolute inset-0'}`}
+          className="page-section w-full h-full overflow-y-auto absolute inset-0"
           style={getSectionStyle(2)}
         >
           <ProjectsSection scrollProgress={scrollProgress} />
@@ -370,7 +364,7 @@ export default function App() {
         {/* Section 3: Manifesto/About split terrain */}
         <div
           id="page-section-3"
-          className={`page-section w-full h-full overflow-y-auto ${isMobile ? 'relative snap-start shrink-0' : 'absolute inset-0'}`}
+          className="page-section w-full h-full overflow-y-auto absolute inset-0"
           style={getSectionStyle(3)}
         >
           <AboutSection />
@@ -379,7 +373,7 @@ export default function App() {
         {/* Section 4: Connection/Contact console */}
         <div
           id="page-section-4"
-          className={`page-section w-full h-full overflow-y-auto ${isMobile ? 'relative snap-start shrink-0' : 'absolute inset-0'}`}
+          className="page-section w-full h-full overflow-y-auto absolute inset-0"
           style={getSectionStyle(4)}
         >
           <ContactSection />
@@ -395,9 +389,9 @@ export default function App() {
           font-family: 'Space Grotesk', system-ui, sans-serif;
         }
 
-        /* Momentum scrolling and boundary containment for mobile */
+        /* Disable momentum scrolling to prevent inertia scrolling inside sections */
         .page-section {
-          -webkit-overflow-scrolling: touch;
+          -webkit-overflow-scrolling: auto;
           overscroll-behavior-y: contain;
         }
 

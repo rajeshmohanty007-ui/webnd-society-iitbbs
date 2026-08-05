@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Terminal, Shield, Cpu, Flame, Menu, X } from 'lucide-react';
+import { useStore } from '../context/useStore';
 
 interface HeaderProps {
   activeSection: number;
@@ -10,6 +11,7 @@ interface HeaderProps {
 export default function Header({ activeSection, setActiveSection, scrollToSection }: HeaderProps) {
   const [time, setTime] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAutoScrollEnabled, setIsAutoScrollEnabled } = useStore();
 
   useEffect(() => {
     const updateTime = () => {
@@ -64,12 +66,32 @@ export default function Header({ activeSection, setActiveSection, scrollToSectio
       </nav>
 
       {/* Clock & Metadata */}
-      <div className="hidden lg:flex flex-col items-end text-[10px] text-neutral-400">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FFEA00] animate-pulse" />
-          <span className="text-[#FFEA00] uppercase tracking-wider">SYSTEM ACTIVE</span>
+      <div className="hidden lg:flex items-center gap-6 text-[10px] text-neutral-400">
+        {/* Toggle Option */}
+        <label className="flex items-center gap-2.5 cursor-pointer select-none border border-[#A88100]/20 bg-black/40 px-3 py-1.5 rounded-sm hover:border-[#FFEA00] transition-all">
+          <input
+            type="checkbox"
+            checked={isAutoScrollEnabled}
+            onChange={(e) => setIsAutoScrollEnabled(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-6 h-3 bg-neutral-800 rounded-full relative peer-checked:bg-[#FFEA00] transition-colors">
+            <div className={`absolute top-[2px] left-[2px] w-2 h-2 rounded-full transition-all duration-200 ${
+              isAutoScrollEnabled ? 'bg-black translate-x-3' : 'bg-neutral-400'
+            }`} />
+          </div>
+          <span className="font-mono text-[9px] uppercase tracking-widest text-neutral-400 peer-checked:text-[#FFEA00] transition-colors">
+            AUTOSCROLL <span className="text-[8px] text-neutral-500 font-bold">(MOUSE RECOMMENDED)</span>
+          </span>
+        </label>
+
+        <div className="flex flex-col items-end border-l border-[#A88100]/20 pl-6">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFEA00] animate-pulse" />
+            <span className="text-[#FFEA00] uppercase tracking-wider">SYSTEM ACTIVE</span>
+          </div>
+          <span className="font-mono mt-1 text-[11px] text-[#A88100] font-semibold">{time}</span>
         </div>
-        <span className="font-mono mt-1 text-[11px] text-[#A88100] font-semibold">{time}</span>
       </div>
 
       {/* Mobile Menu Button */}
