@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, BookOpen, Clock, Activity, Cpu } from 'lucide-react';
-import { TIMELINE_DATA } from '../data';
+import { Shield, BookOpen, Clock, Activity, Cpu, Users, Layers, Calendar, Monitor, MapPin } from 'lucide-react';
+import { EVENTS_DATA } from '../data';
 
 export default function AboutSection() {
   return (
@@ -99,49 +99,107 @@ export default function AboutSection() {
             </div>
           </div>
 
-          {/* Section 3: Historical Timeline */}
+          {/* Section 3: Events We Organize */}
           <div className="space-y-12">
             <div className="font-mono text-[10px] text-[#A88100] tracking-widest uppercase flex items-center gap-2">
-              <Clock size={12} className="text-[#FFEA00]" />
-              <span>03 // CHRONOLOGY TRACE</span>
+              <Calendar size={12} className="text-[#FFEA00]" />
+              <span>03 // EVENTS WE ORGANIZE</span>
             </div>
 
-            {/* Vertical timeline trace with nodes */}
-            <div className="relative border-l border-[#A88100]/30 pl-6 md:pl-10 ml-3 space-y-12">
-              {TIMELINE_DATA.map((event, index) => (
+            {/* Cinematic cards stack with 3D scroll-triggered perspective entry */}
+            <div className="space-y-8 [perspective:1200px]">
+              {EVENTS_DATA.map((event, index) => (
                 <motion.div
-                  initial={{ opacity: 0, x: -15 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: '-5%' }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  key={event.year}
-                  className="relative group"
-                  id={`timeline-event-${event.year}`}
+                  key={event.id}
+                  initial={{ opacity: 0, y: 80, scale: 0.93, rotateX: 15, transformOrigin: 'top center' }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+                  viewport={{ once: false, amount: 0.12 }}
+                  transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+                  className="relative border border-[#A88100]/20 bg-[#0c0c09]/60 hover:border-[#FFEA00]/60 p-6 md:p-8 rounded-sm transition-colors duration-500 overflow-hidden group flex flex-col gap-6"
+                  id={`event-card-${event.id}`}
                 >
-                  {/* Timeline Junction Node dot */}
-                  <div className="absolute -left-[31px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full border border-[#FFEA00] bg-[#0B0B08] flex items-center justify-center group-hover:bg-[#FFEA00] transition-colors duration-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FFEA00] group-hover:bg-[#0B0B08] transition-colors" />
-                  </div>
+                  {/* Subtle matrix-like grid overlay on hover */}
+                  <div className="absolute inset-0 bg-grid-pattern opacity-0 group-hover:opacity-[0.12] transition-opacity duration-500 pointer-events-none" />
+                  
+                  {/* Neon gold radial glow overlay on hover */}
+                  <div className="absolute inset-0 bg-radial-glow opacity-0 group-hover:opacity-[0.08] transition-opacity duration-500 pointer-events-none" />
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-4">
-                      <span className="text-xl font-bold font-mono text-[#FFEA00] tracking-wider">
-                        {event.year}
-                      </span>
-                      <div className="h-[1px] w-8 bg-[#A88100]/30" />
-                      <span className="text-xs font-bold font-mono text-[#FFC107] uppercase tracking-widest">
-                        {event.title}
-                      </span>
+                  {/* Header: Mode Badge, Time Tag, Event Index */}
+                  <div className="flex items-center justify-between font-mono text-[10px] select-none border-b border-[#A88100]/15 pb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-neutral-500 font-bold">[0{index + 1}]</span>
+                      <div className="flex items-center gap-1.5 text-[#FFC107] font-bold uppercase tracking-widest">
+                        <Clock size={11} className="text-[#FFEA00]" />
+                        <span>{event.time}</span>
+                      </div>
                     </div>
 
-                    <p className="text-sm font-sans font-bold text-white uppercase tracking-tight">
+                    <div className={`px-2 py-0.5 rounded-sm text-[9px] font-bold tracking-widest uppercase flex items-center gap-1.5 ${
+                      event.mode === 'online'
+                        ? 'border border-[#FFEA00]/30 text-[#FFEA00] bg-[#FFEA00]/5'
+                        : 'border border-neutral-600/30 text-neutral-300 bg-neutral-900/40'
+                    }`}>
+                      {event.mode === 'online' ? <Monitor size={10} /> : <MapPin size={10} />}
+                      <span>{event.mode}</span>
+                    </div>
+                  </div>
+
+                  {/* Title and main description */}
+                  <div className="space-y-3">
+                    <h4 className="text-2xl sm:text-3xl font-black uppercase text-[#FFEA00] tracking-tight font-sans group-hover:text-white transition-colors duration-300">
+                      {event.title}
+                    </h4>
+                    <p className="text-sm text-neutral-300 leading-relaxed font-sans font-normal">
                       {event.description}
                     </p>
-
-                    <p className="text-xs font-sans text-neutral-400 leading-relaxed">
-                      {event.details}
-                    </p>
                   </div>
+
+                  {/* Metrics grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#A88100]/15 pt-4 font-mono text-[10px] text-neutral-400">
+                    {event.participants && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-neutral-500 text-[8px] uppercase tracking-wider">METRIC_01 // ACTIVE_ENGAGEMENT</span>
+                        <div className="flex items-center gap-2 text-white font-semibold">
+                          <Users size={12} className="text-[#FFEA00]" />
+                          <span>{event.participants} Participants</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {event.rounds && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-neutral-500 text-[8px] uppercase tracking-wider">METRIC_02 // SYSTEM_ROUNDS</span>
+                        <div className="flex items-center gap-2 text-white font-semibold">
+                          <Layers size={12} className="text-[#FFEA00]" />
+                          <span>{event.rounds} Competitions</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {event.focus && (
+                      <div className="flex flex-col gap-1 col-span-1 sm:col-span-2">
+                        <span className="text-neutral-500 text-[8px] uppercase tracking-wider">METRIC_03 // CORE_OBJECTIVE</span>
+                        <div className="flex items-center gap-2 text-white font-semibold">
+                          <Activity size={12} className="text-[#FFEA00]" />
+                          <span>{event.focus}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Round Details */}
+                  {event.roundDetails && event.roundDetails.length > 0 && (
+                    <div className="border-t border-[#A88100]/15 pt-4 space-y-3 font-mono">
+                      <span className="text-neutral-500 text-[8px] uppercase tracking-wider block">PIPELINE_STAGES // COMPILATION_DETAILS</span>
+                      <div className="grid grid-cols-1 gap-2">
+                        {event.roundDetails.map((detail, rIdx) => (
+                          <div key={rIdx} className="p-3 bg-[#0B0B08]/40 border border-[#A88100]/10 hover:border-[#FFEA00]/30 rounded-sm text-xs leading-relaxed text-neutral-300 font-sans transition-all duration-300">
+                            {detail}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Terminal, Shield, Cpu, Flame, Menu, X } from 'lucide-react';
 import { useStore } from '../context/useStore';
+import logo from '../../assets/logo.png';
 
 interface HeaderProps {
   activeSection: number;
@@ -35,10 +36,7 @@ export default function Header({ activeSection, setActiveSection, scrollToSectio
     <header className="fixed top-0 left-0 w-full z-50 bg-[#0B0B08]/80 backdrop-blur-md border-b border-[#A88100]/20 px-6 py-4 md:px-12 flex justify-between items-center font-mono">
       {/* Brand Identity */}
       <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollToSection(0)}>
-        <div className="w-8 h-8 rounded-sm bg-[#FFEA00] flex items-center justify-center text-black font-black text-sm relative overflow-hidden group">
-          <span className="relative z-10">W</span>
-          <div className="absolute inset-0 bg-[#FFC107] translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-        </div>
+        <img src={logo} alt="Web & Design Society logo" className="w-8 h-8 object-contain hover:scale-105 transition-transform duration-300 filter drop-shadow-[0_0_3px_rgba(255,234,0,0.5)]" />
         <div>
           <h1 className="text-sm font-bold uppercase tracking-widest text-[#FFEA00]">IIT BHUBANESWAR</h1>
           <p className="text-[9px] text-[#A88100]/80 tracking-widest">WEB & DESIGN SOCIETY</p>
@@ -76,9 +74,8 @@ export default function Header({ activeSection, setActiveSection, scrollToSectio
             className="sr-only peer"
           />
           <div className="w-6 h-3 bg-neutral-800 rounded-full relative peer-checked:bg-[#FFEA00] transition-colors">
-            <div className={`absolute top-[2px] left-[2px] w-2 h-2 rounded-full transition-all duration-200 ${
-              isAutoScrollEnabled ? 'bg-black translate-x-3' : 'bg-neutral-400'
-            }`} />
+            <div className={`absolute top-[2px] left-[2px] w-2 h-2 rounded-full transition-all duration-200 ${isAutoScrollEnabled ? 'bg-black translate-x-3' : 'bg-neutral-400'
+              }`} />
           </div>
           <span className="font-mono text-[9px] uppercase tracking-widest text-neutral-400 peer-checked:text-[#FFEA00] transition-colors">
             AUTOSCROLL <span className="text-[8px] text-neutral-500 font-bold">(MOUSE RECOMMENDED)</span>

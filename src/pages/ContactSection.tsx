@@ -21,19 +21,47 @@ export default function ContactSection() {
     triggerPulse();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
     setIsSubmitting(true);
 
-    // Simulate high-tech digital transmission sequence
-    setTimeout(() => {
+    const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+
+    if (!scriptUrl) {
+      console.warn("VITE_GOOGLE_SCRIPT_URL is not configured. Falling back to simulated transmission.");
+      // Simulate high-tech digital transmission sequence
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setSubmitSuccess(true);
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setSubmitSuccess(false), 5000);
+      }, 2000);
+      return;
+    }
+
+    try {
+      // mode: 'no-cors' is used because Google Apps Script web apps redirect and do not return standard CORS headers,
+      // but the POST request is still successfully delivered to your spreadsheet.
+      await fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
       setIsSubmitting(false);
       setSubmitSuccess(true);
       setFormData({ name: '', email: '', message: '' });
       setTimeout(() => setSubmitSuccess(false), 5000);
-    }, 2000);
+    } catch (error) {
+      console.error("Transmission failed:", error);
+      alert("Transmission failed. Please check your internet connection.");
+      setIsSubmitting(false);
+    }
   };
 
   return (

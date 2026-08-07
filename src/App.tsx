@@ -409,6 +409,15 @@ export default function App() {
         ::-webkit-scrollbar-thumb:hover {
           background: #FFEA00;
         }
+
+        /* Overlay scanlines for digital signal aesthetic */
+        .bg-scanlines {
+          background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%, 
+            rgba(168, 129, 0, 0.15) 50%
+          );
+          background-size: 100% 6px;
+        }
       `}</style>
     </div>
   );

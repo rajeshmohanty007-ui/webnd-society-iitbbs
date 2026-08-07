@@ -23,9 +23,14 @@ export interface Project {
   demo?: string;
 }
 
-export interface TimelineEvent {
-  year: string;
+export interface EventItem {
+  id: string;
   title: string;
+  mode: 'online' | 'offline';
+  participants?: string;
+  rounds?: number;
+  roundDetails?: string[];
+  focus?: string;
+  time: string;
   description: string;
-  details: string;
 }

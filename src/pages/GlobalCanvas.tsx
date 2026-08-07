@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from '../context/useStore';
 import * as THREE from 'three';
+import logo from '../../assets/logo.png';
 
 export default function GlobalCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -119,6 +120,31 @@ export default function GlobalCanvas() {
     scene.add(gridFloor);
     hudGeometries.push(gridFloor.geometry);
     hudMaterials.push(floorGridMat);
+
+    // 5.1.1 3D Background Logo Artifact (placed vertically on top of Floor Grid in the far ground)
+    const logoTexture = new THREE.TextureLoader().load(logo);
+    const logoGeometry = new THREE.PlaneGeometry(1.6, 1.6);
+    const logoMaterial = new THREE.MeshBasicMaterial({
+      map: logoTexture,
+      color: 0xffea00, // matches gold/yellow theme
+      transparent: true,
+      opacity: 0.12, // faded background artifact
+      blending: THREE.AdditiveBlending, // screen/glow blend
+      depthWrite: false, // background artifact
+      side: THREE.DoubleSide
+    });
+    const logoMesh = new THREE.Mesh(logoGeometry, logoMaterial);
+    
+    // Position vertically on top of floor grid (y: -2.2 center to center offset y: -1.4, so bottom is exactly on floor)
+    // Far ground distance: z: -12.0
+    logoMesh.position.set(0, -1.4, -12.0);
+    
+    // Leaning back slightly on far ground wall and rotated
+    logoMesh.rotation.x = -0.12;
+    logoMesh.rotation.y = 0.08;
+    scene.add(logoMesh);
+    hudGeometries.push(logoGeometry);
+    hudMaterials.push(logoMaterial);
 
     // 5.2 Cylindrical Cyber Blueprint Wall (Wireframe Cage)
     const cylinderGroup = new THREE.Group();
@@ -576,6 +602,7 @@ export default function GlobalCanvas() {
 
       hudGeometries.forEach((g) => g.dispose());
       hudMaterials.forEach((m) => m.dispose());
+      logoTexture.dispose();
     };
   }, [isMobile]);
 
