@@ -1,4 +1,13 @@
 import { Member, Project, EventItem } from './types';
+import aarushImg from '@/assets/Aarush.JPG';
+import prashantImg from '@/assets/PrashantBhaiya.JPG';
+import rajeshImg from '@/assets/Rajesh.JPG';
+import rohitImg from '@/assets/RohitBhaiya.JPG';
+import shantaneelImg from '@/assets/Shantaneel.JPG';
+import shriyaImg from '@/assets/ShriyaDidi.JPG';
+import sampleImg from '@/assets/Sample2.JPG';
+import priyanshuImg from '@/assets/Priyanshu.jpeg';
+import shrutiImg from '@/assets/ShrutiDidi.jpeg';
 
 export const MEMBERS_DATA: Member[] = [
   // Position Holders (col-span-2 row-span-2)
@@ -8,7 +17,7 @@ export const MEMBERS_DATA: Member[] = [
     role: 'The Secretary',
     category: 'executive',
     imageSeed: 'shruti',
-    image: 'assests/Sample2.jpg',
+    image: shrutiImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
     email: 'coordinator.webdesign@iitbbs.ac.in',
@@ -18,8 +27,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'Prashant Sharma',
     role: 'Web Governor',
     category: 'executive',
-    imageSeed: 'nisha_co_coordinator',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'prashant',
+    image: prashantImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
     email: 'cocoordinator.webdesign@iitbbs.ac.in',
@@ -29,8 +38,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'Shriya Panda',
     role: 'Web and Design Governor',
     category: 'executive',
-    imageSeed: 'sayan_web_lead',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'shriya',
+    image: shriyaImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
     email: 'webdev.lead@iitbbs.ac.in',
@@ -40,8 +49,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'K J S Rohit',
     role: 'Design Governor',
     category: 'executive',
-    imageSeed: 'rohan_design_lead',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'rohit',
+    image: rohitImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
     email: 'creative.lead@iitbbs.ac.in',
@@ -52,8 +61,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'Rajesh Mohanty',
     role: 'Dev Lead',
     category: 'core',
-    imageSeed: 'pranav_core',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'rajesh',
+    image: rajeshImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
   },
@@ -62,8 +71,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'Priyanshu Dev Guru',
     role: 'Design Lead',
     category: 'core',
-    imageSeed: 'kritika_core',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'priyanshu',
+    image: priyanshuImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
   },
@@ -72,8 +81,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'Aarush Mahawar',
     role: 'Management Lead',
     category: 'core',
-    imageSeed: 'ananya_core',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'aarush',
+    image: aarushImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
   },
@@ -82,8 +91,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'Shantaneel Sarkar',
     role: 'Public Connection Lead',
     category: 'core',
-    imageSeed: 'aditya_core',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'shantaneel',
+    image: shantaneelImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
   },
@@ -93,8 +102,8 @@ export const MEMBERS_DATA: Member[] = [
     name: 'Biswajit Bhaiya',
     role: 'Former Coordinator (2024-25) • Now SDE at Stripe',
     category: 'alumni',
-    imageSeed: 'siddharth_alumni',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'biswajit_alumni',
+    image: sampleImg,
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
   },
@@ -105,8 +114,8 @@ export const MEMBERS_DATA: Member[] = [
     category: 'alumni',
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
-    imageSeed: 'meghna_alumni',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'ashish_alumni',
+    image: sampleImg,
   },
   {
     id: 'm13',
@@ -115,8 +124,8 @@ export const MEMBERS_DATA: Member[] = [
     category: 'alumni',
     github: 'https://github.com',
     linkedin: 'https://linkedin.com',
-    imageSeed: 'tushar_alumni',
-    image: 'assests/Sample2.jpg',
+    imageSeed: 'ayush_alumni',
+    image: sampleImg,
   }
 ];
 

@@ -10,7 +10,7 @@ function InteractiveMemberCard({ member, isExecutive = false, image }: { member:
 
     const getImageUrl = () => {
         if (!image) return undefined;
-        if (image.includes('Sample2.jpg') || image.includes('Sample2.JPG') || image.includes('assests') || image.includes('assets')) {
+        if (image === 'assests/Sample2.jpg' || image.includes('Sample2.JPG') || image.includes('Sample2.jpg')) {
             return sampleImg;
         }
         return image;

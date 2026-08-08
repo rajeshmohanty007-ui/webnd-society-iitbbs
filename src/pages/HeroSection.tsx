@@ -42,34 +42,36 @@ export default function HeroSection({ scrollProgress, scrollToSection }: HeroSec
 
       {/* Center Hero Kinetic Typography */}
       <div className="flex-1 flex flex-col justify-center items-center w-full max-w-5xl text-center space-y-4 md:space-y-6 z-10 mt-10">
+        <h1 className="sr-only">Web and Design Society (WebnD), IIT Bhubaneswar | Imagine, Code, Transform</h1>
+
         <div className="overflow-hidden w-full">
-          <motion.h1
+          <motion.div
             style={{ x: line1X }}
             className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-[#FFEA00] font-sans"
             id="hero-line-1"
           >
             IMAGINE //
-          </motion.h1>
+          </motion.div>
         </div>
 
         <div className="overflow-hidden w-full">
-          <motion.h1
+          <motion.div
             style={{ x: line2X }}
             className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-transparent stroke-text font-sans"
             id="hero-line-2"
           >
             CODE //
-          </motion.h1>
+          </motion.div>
         </div>
 
         <div className="overflow-hidden w-full">
-          <motion.h1
+          <motion.div
             style={{ x: line3X }}
             className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tighter text-[#FFC107] font-sans"
             id="hero-line-3"
           >
             TRANSFORM
-          </motion.h1>
+          </motion.div>
         </div>
 
         {/* Short high-concept subtext */}
